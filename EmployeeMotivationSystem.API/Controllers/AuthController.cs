@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeMotivationSystem.API.Controllers;
 
-public class AuthController : BaseController
+public sealed class AuthController : BaseController
 {
     private const string CookieRefreshTokenName = "RefreshToken";
     

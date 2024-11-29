@@ -18,5 +18,5 @@ public sealed record User : BaseModel
     /// <summary>
     /// Пароль
     /// </summary>
-    public required string Password { get; init; }
+    public required string Password { get; set; }
 }

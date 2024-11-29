@@ -11,7 +11,7 @@ namespace EmployeeMotivationSystem.API.Controllers;
 
 public sealed class AuthController : BaseController
 {
-    private const string CookieRefreshTokenName = "RefreshToken";
+    public const string CookieRefreshTokenName = "RefreshToken";
     
     public AuthController(AppDbContext dbContext) 
         : base(dbContext) { }
@@ -86,7 +86,7 @@ public sealed class AuthController : BaseController
         
         Response.Cookies.Delete(CookieRefreshTokenName);
 
-        return StatusCode(200);
+        return Ok();
     }
     
     [HttpPost("Refresh")]

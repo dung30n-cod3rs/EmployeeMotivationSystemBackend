@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using EmployeeMotivationSystem.API.Constants;
 using EmployeeMotivationSystem.API.Models;
+using EmployeeMotivationSystem.API.Models.Auth;
 using EmployeeMotivationSystem.DAL;
 using EmployeeMotivationSystem.DAL.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +24,9 @@ public sealed class AuthController : BaseController
 
         if (user != null)
             throw new Exception($"User with email: {request.Email} already exists!");
+
+        if (request.Password != request.RepeatPassword)
+            throw new Exception("Password and RepeatPassword fields are not equal!");
         
         var createdUser = await DbContext.Users.AddAsync(new User
         {

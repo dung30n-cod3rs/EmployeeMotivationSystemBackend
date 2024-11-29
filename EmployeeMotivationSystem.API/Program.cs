@@ -63,13 +63,32 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
+app.UseCors(c =>
+{
+    c
+        .AllowAnyOrigin()
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+});
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(opt =>
+    {
+        // opt.RoutePrefix = "/api";
+        // opt.SwaggerEndpoint("/swagger/v1/swagger.json", "Name");
+    });
 }
 
+// app.UseMiddleware<ExceptionCatcherMiddleware>();
+
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();

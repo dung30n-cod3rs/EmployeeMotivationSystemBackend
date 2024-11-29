@@ -1,4 +1,4 @@
-﻿namespace EmployeeMotivationSystem.API.Models;
+﻿namespace EmployeeMotivationSystem.API.Models.Auth;
 
 public sealed record RefreshUserResponseApiDto
 {

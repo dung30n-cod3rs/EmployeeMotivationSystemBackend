@@ -1,10 +1,11 @@
-﻿namespace EmployeeMotivationSystem.API.Models;
+﻿namespace EmployeeMotivationSystem.API.Models.Auth;
 
 public sealed record RegisterUserRequestApiDto
 {
     public required string Name { get; init; }
     public required string Email { get; init; }
     public required string Password { get; init; }
+    public required string RepeatPassword { get; init; }
 }
 
 public sealed record RegisterUserResponseApiDto

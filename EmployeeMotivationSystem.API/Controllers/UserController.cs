@@ -1,5 +1,10 @@
-﻿using EmployeeMotivationSystem.DAL;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using EmployeeMotivationSystem.API.Constants;
+using EmployeeMotivationSystem.DAL;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace EmployeeMotivationSystem.API.Controllers;
 
@@ -9,11 +14,35 @@ public sealed class UserController : BaseController
     {
     }
     
-    [HttpGet]
+    [HttpGet("Get0")]
     public async Task<int> Get()
     {
         return 1;
     }
+    
+    [Authorize]
+    [HttpGet("Get1")]
+    public async Task<int> Get1()
+    {
+        return 2;
+    }
+    
+    
+    [HttpGet("Get1/{userName}")]
+    public async Task<string> Get1(string userName)
+    {
+        var claims = new List<Claim> {new Claim(ClaimTypes.Name, userName) };
+        
+        var jwt = new JwtSecurityToken(
+            issuer: AppAuthOptions.Issuer,
+            audience: AppAuthOptions.Audience,
+            claims: claims,
+            expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(100)), // время действия 100 минуты
+            signingCredentials: new SigningCredentials(AppAuthOptions.SymmetricSecurityKey, SecurityAlgorithms.HmacSha256));
+            
+        return new JwtSecurityTokenHandler().WriteToken(jwt);
+    }
+    
     
     // [HttpGet]
     // public async Task<ActionResult<IEnumerable<User>>> Get()

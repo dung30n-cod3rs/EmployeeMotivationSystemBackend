@@ -1,7 +1,9 @@
-using System.Net;
+using EmployeeMotivationSystem.API.Constants;
 using EmployeeMotivationSystem.API.Mapper;
 using EmployeeMotivationSystem.DAL;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 const string connectionStringKey = "BaseStorage";
 const string dataAccessLayerAssemblyName = "EmployeeMotivationSystem.DAL";
@@ -32,6 +34,31 @@ builder.Services
 );
 
 builder.Services.RegisterMapsterConfiguration();
+
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            // указывает, будет ли валидироваться издатель при валидации токена
+            ValidateIssuer = true,
+            // строка, представляющая издателя
+            ValidIssuer = AppAuthOptions.Issuer,
+            // будет ли валидироваться потребитель токена
+            ValidateAudience = true,
+            // установка потребителя токена
+            ValidAudience = AppAuthOptions.Audience,
+            // будет ли валидироваться время существования
+            ValidateLifetime = true,
+            // установка ключа безопасности
+            IssuerSigningKey = AppAuthOptions.SymmetricSecurityKey,
+            // валидация ключа безопасности
+            ValidateIssuerSigningKey = true,
+        };
+    });
+
+
 builder.Services.AddControllers();
 
 var app = builder.Build();

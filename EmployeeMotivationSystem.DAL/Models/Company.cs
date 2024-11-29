@@ -7,10 +7,6 @@ public sealed record Company : BaseModel
     [MaxLength(100)]
     public required string Name { get; init; }
     
-    [MaxLength(200)]
-    public required string Address { get; init; }
-    
-    // TODO: ForeignKey
-    public int CreatorUserId { get; init; }
+    public int? CreatorUserId { get; init; }
     public User? CreatorUser { get; init; }
 }

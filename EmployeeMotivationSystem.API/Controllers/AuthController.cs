@@ -1,34 +1,130 @@
-﻿using EmployeeMotivationSystem.DAL;
+﻿using System.Security.Claims;
+using EmployeeMotivationSystem.API.Constants;
+using EmployeeMotivationSystem.API.Models;
+using EmployeeMotivationSystem.DAL;
+using EmployeeMotivationSystem.DAL.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeMotivationSystem.API.Controllers;
 
 public class AuthController : BaseController
 {
+    private const string CookieRefreshTokenName = "RefreshToken";
+    
     public AuthController(AppDbContext dbContext) 
         : base(dbContext) { }
     
-    [HttpPost("login")]
-    public async Task<int> Login()
+    [HttpPost("Register")]
+    public async Task<RegisterUserResponseApiDto> Register([FromBody] RegisterUserRequestApiDto request)
     {
-        return 1;
+        var user = await DbContext.Users
+            .SingleOrDefaultAsync(el => el.Email == request.Email);
+
+        if (user != null)
+            throw new Exception($"User with email: {request.Email} already exists!");
+        
+        var createdUser = await DbContext.Users.AddAsync(new User
+        {
+            Name = request.Name,
+            Email = request.Email,
+            Password = request.Password
+        });
+
+        await DbContext.SaveChangesAsync();
+
+        var (jwtToken, refreshToken) = await GenerateAndSaveJwtAndRefreshToken(createdUser.Entity);
+        
+        Response.Cookies.Append(CookieRefreshTokenName, refreshToken);
+        
+        return new RegisterUserResponseApiDto
+        {
+            Token = jwtToken,
+            RefreshToken = refreshToken
+        };
     }
     
-    [HttpPost("register")]
-    public async Task<int> Register()
+    [HttpPost("Login")]
+    public async Task<LoginUserResponseApiDto> Login([FromBody] LoginUserRequestApiDto request)
     {
-        return 1;
+        var user = await DbContext.Users.SingleOrDefaultAsync(el =>
+            el.Email == request.Email 
+            && el.Password == request.Password
+        );
+
+        if (user == null)
+            throw new Exception("User with requested credentials not found!");
+        
+        var (jwtToken, refreshToken) = await GenerateAndSaveJwtAndRefreshToken(user);
+        
+        Response.Cookies.Append(CookieRefreshTokenName, refreshToken);
+        
+        return new LoginUserResponseApiDto
+        {
+            Token = jwtToken,
+            RefreshToken = refreshToken
+        };
     }
     
-    [HttpPost("logout")]
-    public async Task<int> Logout()
+    [HttpPost("Logout")]
+    public async Task<IActionResult> Logout()
     {
-        return 1;
+        var isRefreshTokenExists = Request.Cookies.TryGetValue(CookieRefreshTokenName, out var outValue);
+
+        if (isRefreshTokenExists)
+        {
+            var refreshTokenObj = await DbContext.RefreshTokens
+                .SingleOrDefaultAsync(el => el.Token == outValue);
+
+            if (refreshTokenObj != null)
+                DbContext.RefreshTokens.Remove(refreshTokenObj);
+        }
+        
+        Response.Cookies.Delete(CookieRefreshTokenName);
+
+        return StatusCode(200);
     }
     
-    [HttpPost("refresh")]
-    public async Task<int> Refresh()
+    [HttpPost("Refresh")]
+    public async Task<RefreshUserResponseApiDto> Refresh()
     {
-        return 1;
+        var isRefreshTokenExists = Request.Cookies.TryGetValue(CookieRefreshTokenName, out var outValue);
+
+        if (isRefreshTokenExists)
+        {
+            var refreshTokenObj = await DbContext.RefreshTokens
+                .Include(refreshToken => refreshToken.User)
+                .SingleOrDefaultAsync(el => el.Token == outValue);
+
+            if (refreshTokenObj != null)
+            {
+                var (jwtToken, refreshToken) = await GenerateAndSaveJwtAndRefreshToken(refreshTokenObj.User);
+
+                return new RefreshUserResponseApiDto
+                {
+                    Token = jwtToken,
+                    RefreshToken = refreshToken
+                };
+            }
+        }
+
+        throw new Exception("Cookie token is bad.");
+    }
+
+    private async Task<(string jwt, string refresh)> GenerateAndSaveJwtAndRefreshToken(User user)
+    {
+        var jwtToken = AppAuthOptions.GenerateJwtToken(new []{ new Claim(ClaimTypes.Email, user.Name) });
+        var refreshToken = AppAuthOptions.GenerateRefreshToken();
+
+        await DbContext.RefreshTokens.AddAsync(new RefreshToken
+        {
+            User = user,
+            Token = refreshToken,
+            ExpiresAt = DateTime.UtcNow.AddDays(30)
+        });
+        
+        await DbContext.SaveChangesAsync();
+
+        return (jwt: jwtToken, refresh: refreshToken);
     }
 }

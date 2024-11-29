@@ -2,7 +2,7 @@
 
 public sealed record RefreshToken : BaseModel
 {
-    public required int UserId { get; init; }
+    public int UserId { get; init; }
     public required User User { get; init; }
     
     public required string Token { get; init; }

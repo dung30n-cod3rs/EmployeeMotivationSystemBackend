@@ -1,14 +1,37 @@
-﻿using System.Text;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
 namespace EmployeeMotivationSystem.API.Constants;
 
-public class AppAuthOptions
+public static class AppAuthOptions
 {
-    private const string AuthKey = "M*F8s*sdf7929rh9Hf8S8f79s9__euf";
+    private const string AuthKey = "supersecretkey_supersecretkey_supersecretkey_supersecretkey";
     
     public const string Issuer = "EmployeeMotivationSystemBackend";
     public const string Audience = "EmployeeMotivationSystemFrontend";
     
     public static SymmetricSecurityKey SymmetricSecurityKey => new(Encoding.UTF8.GetBytes(AuthKey));
+
+    public static string GenerateJwtToken(IEnumerable<Claim> claims)
+    {
+        var jwt = new JwtSecurityToken(
+            issuer: Issuer,
+            audience: Audience,
+            claims: claims,
+            expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(5)),
+            signingCredentials: new SigningCredentials(SymmetricSecurityKey, SecurityAlgorithms.HmacSha256));
+            
+        return new JwtSecurityTokenHandler().WriteToken(jwt);
+    }
+
+    public static string GenerateRefreshToken()
+    {
+        var randomNumber = new byte[64];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return Convert.ToBase64String(randomNumber);
+    }
 }

@@ -5,25 +5,18 @@ namespace EmployeeMotivationSystem.DAL.Models;
 public sealed record User : BaseModel
 {
     /// <summary>
-    /// Имя
+    /// ФИО
     /// </summary>
-    [MaxLength(100)]
-    public required string FirstName { get; init; }
-    
-    /// <summary>
-    /// Фамилия
-    /// </summary>
-    [MaxLength(100)]
-    public required string LastName { get; init; }
-    
-    /// <summary>
-    /// Отчество
-    /// </summary>
-    [MaxLength(100)]
-    public string? MiddleName { get; init; }
+    [MaxLength(200)]
+    public required string Name { get; init; }
     
     /// <summary>
     /// Email
     /// </summary>
     public required string Email { get; init; }
+    
+    /// <summary>
+    /// Пароль
+    /// </summary>
+    public required string Password { get; init; }
 }

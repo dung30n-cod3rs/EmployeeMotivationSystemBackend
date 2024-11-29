@@ -1,7 +1,11 @@
-﻿namespace EmployeeMotivationSystem.DAL.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace EmployeeMotivationSystem.DAL.Models;
 
 public abstract record BaseModel
 {
-    public Guid Id { get; init; }
-    public DateTime CreationDate { get; init; }
+    [Key]
+    public int Id { get; init; }
+    
+    public DateTime CreationDate { get; init; } = DateTime.UtcNow;
 }

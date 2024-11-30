@@ -139,11 +139,11 @@ public sealed class CompaniesController : BaseController
         if (company == null)
             throw new Exception($"Company with id: {request.CompanyId} not found!");
         
-        var position = await DbContext.Filials
+        var position = await DbContext.Positions
             .SingleOrDefaultAsync(el => el.Id == request.PositionId);
 
         if (position == null)
-            throw new Exception($"Filial with id: {request.PositionId} not found!");
+            throw new Exception($"Position with id: {request.PositionId} not found!");
 
         var currentCompanyPositionsIds = await DbContext.Positions
             .Include(el => el.Company)

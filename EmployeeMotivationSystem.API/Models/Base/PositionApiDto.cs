@@ -2,10 +2,9 @@
 
 public sealed record PositionApiDto
 {
-    public required DateTime PositionCreationDate { get; init; }
-    public required string PositionName { get; init; }
-    public required int PositionWeight { get; init; }
+    public required DateTime CreationDate { get; init; }
+    public required string Name { get; init; }
+    public required int Weight { get; init; }
     
-    public required DateTime CompanyCreationDate { get; init; }
-    public required string CompanyName { get; init; }
+    public required CompanyApiDto Company { get; init; }
 }

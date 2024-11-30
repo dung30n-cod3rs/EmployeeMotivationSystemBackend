@@ -148,11 +148,14 @@ public sealed class CompaniesController : BaseController
         {
             Items = positions.Select(el => new PositionApiDto
             {
-                PositionCreationDate = el.CreationDate,
-                PositionName = el.Name,
-                PositionWeight = el.Weight,
-                CompanyCreationDate = el.Company.CreationDate,
-                CompanyName = el.Company.Name
+                CreationDate = el.CreationDate,
+                Name = el.Name,
+                Weight = el.Weight,
+                Company = new CompanyApiDto
+                {
+                    CreationDate = el.Company.CreationDate,
+                    Name = el.Company.Name
+                }
             })
         };
     }

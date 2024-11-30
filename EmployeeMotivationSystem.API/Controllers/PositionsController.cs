@@ -36,12 +36,15 @@ public sealed class PositionsController : BaseController
         {
             Item = new PositionApiDto
             {
-                PositionCreationDate = newPosition.Entity.CreationDate,
-                PositionName = newPosition.Entity.Name,
-                PositionWeight = newPosition.Entity.Weight,
+                CreationDate = newPosition.Entity.CreationDate,
+                Name = newPosition.Entity.Name,
+                Weight = newPosition.Entity.Weight,
                 
-                CompanyCreationDate = company.CreationDate,
-                CompanyName = company.Name
+                Company = new CompanyApiDto
+                {
+                    CreationDate = company.CreationDate,
+                    Name = company.Name
+                }
             }
         };
     }
@@ -71,12 +74,15 @@ public sealed class PositionsController : BaseController
         {
             Item = new PositionApiDto
             {
-                PositionCreationDate = position.CreationDate,
-                PositionName = position.Name,
-                PositionWeight = position.Weight,
+                CreationDate = position.CreationDate,
+                Name = position.Name,
+                Weight = position.Weight,
                 
-                CompanyCreationDate = company.CreationDate,
-                CompanyName = company.Name
+                Company = new CompanyApiDto
+                {
+                    CreationDate = company.CreationDate,
+                    Name = company.Name
+                }
             }
         };
     }

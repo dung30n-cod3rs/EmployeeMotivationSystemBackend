@@ -2,10 +2,5 @@
 
 public sealed record DeleteMetricRequestApiDto
 {
-    
-}
-
-public sealed record DeleteMetricResponseApiDto
-{
-    
+    public required int MetricId { get; init; }
 }

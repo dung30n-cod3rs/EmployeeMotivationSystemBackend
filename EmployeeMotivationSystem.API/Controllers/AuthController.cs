@@ -116,7 +116,7 @@ public sealed class AuthController : BaseController
 
     private async Task<(string jwt, string refresh)> GenerateAndSaveJwtAndRefreshToken(User user)
     {
-        var jwtToken = AppAuthOptions.GenerateJwtToken(new []{ new Claim(ClaimTypes.Email, user.Name) });
+        var jwtToken = AppAuthOptions.GenerateJwtToken(new []{ new Claim(ClaimTypes.Email, user.Email) });
         var refreshToken = AppAuthOptions.GenerateRefreshToken();
 
         await DbContext.RefreshTokens.AddAsync(new RefreshToken

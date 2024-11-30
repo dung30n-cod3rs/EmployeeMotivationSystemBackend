@@ -1,6 +1,7 @@
 ﻿using EmployeeMotivationSystem.API.Models.Base;
 using EmployeeMotivationSystem.API.Models.Companies;
 using EmployeeMotivationSystem.DAL;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,7 @@ public sealed class CompaniesController : BaseController
     public CompaniesController(AppDbContext dbContext) 
         : base(dbContext) { }
     
+    [Authorize]
     [HttpGet("{id:int}")]
     public async Task<GetCompanyByIdResponseApiDto> GetCompanyById(int id)
     {

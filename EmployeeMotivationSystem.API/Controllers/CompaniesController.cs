@@ -36,15 +36,20 @@ public sealed class CompaniesController : BaseController
         };
     }
 
+    public class TestObj
+    {
+        public int Cock { get; set; }
+    }
+    
     [HttpGet("{id:int}/members")]
     public async Task<GetCompanyMembersByIdResponseApiDto> GetCompanyMembersById(int id)
     {
         var company = await DbContext.Companies
             .SingleOrDefaultAsync(el => el.Id == id);
-
+        
         if (company == null)
             throw new Exception($"Company with id: {id} not found!");
-
+        
         var members = await DbContext.CompaniesUsers
             .Include(el => el.Company)
             .Include(el => el.User)

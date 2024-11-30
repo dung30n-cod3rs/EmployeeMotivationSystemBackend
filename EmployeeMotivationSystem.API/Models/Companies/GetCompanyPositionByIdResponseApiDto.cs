@@ -4,5 +4,5 @@ namespace EmployeeMotivationSystem.API.Models.Companies;
 
 public sealed record GetCompanyPositionByIdResponseApiDto
 {
-    public required IEnumerable<PositionApiDto> Items = [];
+    public required IEnumerable<PositionApiDto> Items { get; init; } = [];
 }

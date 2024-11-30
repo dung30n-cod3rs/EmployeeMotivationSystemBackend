@@ -2,7 +2,7 @@
 
 public sealed record GetCompanyMembersByIdResponseApiDto
 {
-    public IEnumerable<GetCompanyMembersByIdItemResponseApiDto> Items = [];
+    public IEnumerable<GetCompanyMembersByIdItemResponseApiDto> Items { get; init; } = [];
 
     public sealed record GetCompanyMembersByIdItemResponseApiDto
     {

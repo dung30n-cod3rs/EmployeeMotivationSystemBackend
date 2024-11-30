@@ -2,11 +2,13 @@
 using EmployeeMotivationSystem.API.Models.Metrics;
 using EmployeeMotivationSystem.DAL;
 using EmployeeMotivationSystem.DAL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeMotivationSystem.API.Controllers;
 
+[Authorize]
 public sealed class MetricsController : BaseController
 {
     public MetricsController(AppDbContext dbContext) 

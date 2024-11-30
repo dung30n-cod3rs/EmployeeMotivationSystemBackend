@@ -1,11 +1,13 @@
 ﻿using EmployeeMotivationSystem.API.Models.Members;
 using EmployeeMotivationSystem.DAL;
 using EmployeeMotivationSystem.DAL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeMotivationSystem.API.Controllers;
 
+[Authorize]
 public sealed class MembersController : BaseController
 {
     public MembersController(AppDbContext dbContext) 

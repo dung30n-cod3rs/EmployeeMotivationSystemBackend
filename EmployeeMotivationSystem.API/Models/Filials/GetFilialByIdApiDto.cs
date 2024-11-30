@@ -1,6 +1,8 @@
-﻿namespace EmployeeMotivationSystem.API.Models.Filials;
+﻿using EmployeeMotivationSystem.API.Models.Base;
 
-public class GetFilialByIdApiDto
+namespace EmployeeMotivationSystem.API.Models.Filials;
+
+public sealed record GetFilialByIdResponseApiDto
 {
-    
+    public required FilialApiDto Item { get; init; }
 }

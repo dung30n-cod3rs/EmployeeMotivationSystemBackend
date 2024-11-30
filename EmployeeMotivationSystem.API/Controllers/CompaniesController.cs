@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeMotivationSystem.API.Controllers;
 
+[Authorize]
 public sealed class CompaniesController : BaseController
 {
     public CompaniesController(AppDbContext dbContext) 

@@ -13,13 +13,7 @@ var builder = WebApplication.CreateBuilder();
 
 builder.WebHost.ConfigureKestrel(options =>
 {
-    options.Listen(IPAddress.Any, 5000, listenOptions =>
-    {
-        options.Limits.MaxRequestBodySize = int.MaxValue;
-        
-        listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
-    });
-    
+    options.Listen(IPAddress.Any, 5000);
 });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -62,17 +56,15 @@ app.UseCors(c =>
 });
 
 // Configure the HTTP request pipeline.
-// if (app.Environment.IsDevelopment())
-// {
-//     
-// }
-
-app.UseSwagger();
-app.UseSwaggerUI(opt =>
+if (app.Environment.IsDevelopment() || true == true)
 {
-    // opt.RoutePrefix = "/api";
-    // opt.SwaggerEndpoint("/swagger/v1/swagger.json", "Name");
-});
+    app.UseSwagger();
+    app.UseSwaggerUI(opt =>
+    {
+        // opt.RoutePrefix = "/api";
+        // opt.SwaggerEndpoint("/swagger/v1/swagger.json", "Name");
+    });
+}
 
 app.UseMiddleware<ExceptionCatcherMiddleware>();
 
@@ -83,8 +75,10 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-using (var scope = app.Services.CreateScope())
+// TODO: Maybe we need call to dotnet ef database update into dockerfile?
+if (!app.Environment.IsDevelopment())
 {
+    using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
 
     var context = services.GetRequiredService<AppDbContext>();

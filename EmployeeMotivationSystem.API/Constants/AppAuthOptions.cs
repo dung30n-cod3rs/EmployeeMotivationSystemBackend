@@ -8,10 +8,10 @@ namespace EmployeeMotivationSystem.API.Constants;
 
 public static class AppAuthOptions
 {
-    private const string AuthKey = "supersecretkey_supersecretkey_supersecretkey_supersecretkey";
+    private const string AuthKey = "supersecretkey_supersecretkey_supersecretkey_supersecretkey"; // TODO: To app config
     
-    public const string Issuer = "EmployeeMotivationSystemBackend";
-    public const string Audience = "EmployeeMotivationSystemFrontend";
+    public const string Issuer = "EmployeeMotivationSystemBackend"; // TODO: To app config
+    public const string Audience = "EmployeeMotivationSystemFrontend"; // TODO: To app config
     
     public static SymmetricSecurityKey SymmetricSecurityKey => new(Encoding.UTF8.GetBytes(AuthKey));
 

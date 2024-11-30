@@ -2,17 +2,18 @@
 using EmployeeMotivationSystem.API.Models.Users;
 using EmployeeMotivationSystem.DAL;
 using EmployeeMotivationSystem.DAL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeMotivationSystem.API.Controllers;
 
+[Authorize]
 public sealed class UsersController : BaseController
 {
     public UsersController(AppDbContext dbContext) 
         : base(dbContext) { }
     
-    // TODO: Authorize
     [HttpGet("{id:int}")]
     public async Task<GetUserByIdResponseApiDto> GetUserById(int id)
     {
@@ -34,7 +35,6 @@ public sealed class UsersController : BaseController
         };
     }
     
-    // TODO: Authorize
     [HttpGet("Metrics")]
     public async Task<GetUserMetricsByIdResponseApiDto> GetUserMetricsById(GetUserMetricsByIdRequestApiDto request)
     {
@@ -91,7 +91,7 @@ public sealed class UsersController : BaseController
                 })
         };
     }
-
+    
     [HttpPost("ChangePassword")]
     public async Task<IActionResult> ChangeUserPassword([FromBody] ChangeUserPasswordRequestApiDto request)
     {
@@ -128,9 +128,8 @@ public sealed class UsersController : BaseController
         
         return Ok();
     }
-
-    // TODO: Move to BLL 100%
     
+    // TODO: Move to BLL 100%
     private double CalculateBonuses(CompaniesUser user, IEnumerable<CompaniesUsersMetric> metrics)
     {
         var arrayedMetrics = metrics.ToArray();

@@ -2,11 +2,13 @@
 using EmployeeMotivationSystem.API.Models.Positions;
 using EmployeeMotivationSystem.DAL;
 using EmployeeMotivationSystem.DAL.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmployeeMotivationSystem.API.Controllers;
 
+[Authorize]
 public sealed class PositionsController : BaseController
 {
     public PositionsController(AppDbContext dbContext) 

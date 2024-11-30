@@ -130,54 +130,66 @@ public sealed class CompaniesController : BaseController
         };
     }
     
+    // Таблица метрик юзера
+    
     [HttpPost("MetricsByFilter")]
     public async Task<GetCompanyMetricsByIdResponseApiDto> GetCompanyMetricsById([FromBody] GetCompanyMetricsByIdRequestApiDto request)
     {
-        var company = await DbContext.Companies
-            .SingleOrDefaultAsync(el => el.Id == request.CompanyId);
-
-        if (company == null)
-            throw new Exception($"Company with id: {request.CompanyId} not found!");
+        var member = await DbContext.CompaniesUsers
+            .SingleOrDefaultAsync(el => el.UserId == request.UserId);
         
-        var position = await DbContext.Positions
-            .SingleOrDefaultAsync(el => el.Id == request.PositionId);
+        if (member == null)
+            throw new Exception($"Member with id: {request.UserId} not found or not pinned to any company!");
 
-        if (position == null)
-            throw new Exception($"Position with id: {request.PositionId} not found!");
-
-        var currentCompanyPositionsIds = await DbContext.Positions
-            .Include(el => el.Company)
-            .Where(el => el.CompanyId == request.CompanyId)
-            .Select(el => el.Id)
+        var metricIdToMetricCount = await DbContext.CompaniesUsersMetrics
+            .Where(el => el.MemberId == member.Id)
+            .Where(el => el.CreationDate >= request.CreationDateFrom)
+            .Where(el => el.CreationDate <= request.CreationDateTo)
+            .GroupBy(el => el.MetricId)
+            .Select(el => new
+            {
+                el.Key,
+                Count = el.Count()
+            })
+            .Join(
+                DbContext.Metrics, 
+                obj1 => obj1.Key,
+                obj2 => obj2.Id,
+                (obj1, obj2) => new
+                {
+                    Id = obj2.Id,
+                    CreationDate = obj2.CreationDate,
+                    Name = obj2.Name,
+                    Weight = obj2.Weight,
+                    Description = obj2.Description,
+                    TargetValue = obj2.TargetValue,
+                    PositionId = obj2.PositionId,
+                    Count = obj1.Count
+                }                
+            )
             .ToArrayAsync();
 
-        var currentCompanyMetricsByPositions = await DbContext.Metrics
-            .Where(el => currentCompanyPositionsIds.Contains(el.Id))
-            .ToArrayAsync();
-
+        var metrics = metricIdToMetricCount.Select(el => new Metric
+        {
+            Id = el.Id,
+            CreationDate = el.CreationDate,
+            Name = el.Name,
+            PositionId = el.PositionId,
+            Weight = el.Weight,
+            Description = el.Description,
+            TargetValue = el.TargetValue
+        });
+        
         return new GetCompanyMetricsByIdResponseApiDto()
         {
-            Items = currentCompanyMetricsByPositions.Select(el => new MetricApiDto
+            Items = metricIdToMetricCount.Select(el => new GetCompanyMetricsByIdResponseApiDto.GetCompanyMetricsByIdItemResponseApiDto
             {
-                Id = el.Id,
-                CreationDate = el.CreationDate,
                 Name = el.Name,
                 Weight = el.Weight,
                 Description = el.Description,
                 TargetValue = el.TargetValue,
-                Position = new PositionApiDto
-                {
-                    Id = el.Position.Id,
-                    CreationDate = el.Position.CreationDate,
-                    Name = el.Position.Name,
-                    Weight = el.Position.Weight,
-                    Company = new CompanyApiDto
-                    {
-                        Id = el.Position.Company.Id,
-                        CreationDate = el.Position.Company.CreationDate,
-                        Name = el.Position.Company.Name
-                    }
-                }
+                Count = el.Count,
+                Bonus = UsersController.CalculateBonuses(member.Salary, metrics, el.Count)
             })
         };
     }

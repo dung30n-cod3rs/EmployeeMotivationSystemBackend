@@ -120,7 +120,7 @@ public sealed class UsersController : BaseController
                     MetricTargetValue = el.Metric.TargetValue,
 
                     Count = metricsCount,
-                    Bonuses = CalculateBonuses(anyCompanyUser.Member, companiesUsersMetrics)
+                    Bonuses = CalculateBonuses(anyCompanyUser.Member.Salary, companiesUsersMetrics.Select(met => met.Metric), metricsCount)
                 })
         };
     }
@@ -163,18 +163,18 @@ public sealed class UsersController : BaseController
     }
     
     // TODO: Move to BLL 100%
-    private double CalculateBonuses(CompaniesUser user, IEnumerable<CompaniesUsersMetric> metrics)
+    public static double CalculateBonuses(double userSalary, IEnumerable<Metric> metricsForCalculation, int userMetricsCount)
     {
-        var arrayedMetrics = metrics.ToArray();
+        var arrayedMetrics = metricsForCalculation.ToArray();
         
         var totalBonus = 0d;
 
-        var maxBonus = user.Salary * 0.5;
+        var maxBonus = userSalary * 0.5;
 
         foreach (var metric in arrayedMetrics)
         {
-            var metricScore = CalculateMetricScore(metric.Metric, arrayedMetrics.Length);
-            var weightedScore = metricScore * metric.Metric.Weight;
+            var metricScore = CalculateMetricScore(metric.TargetValue, userMetricsCount);
+            var weightedScore = metricScore * metric.Weight;
             totalBonus += weightedScore;
         }
 
@@ -183,9 +183,9 @@ public sealed class UsersController : BaseController
         return normalizedBonuses;
     }
 
-    private double CalculateMetricScore(Metric metric, int actualValue)
+    public static double CalculateMetricScore(double metricTargetValue, int actualValue)
     {
-        var score = (actualValue / metric.TargetValue) * 100;
+        var score = (actualValue / metricTargetValue) * 100;
         
         return Math.Min(score, 150);
     }

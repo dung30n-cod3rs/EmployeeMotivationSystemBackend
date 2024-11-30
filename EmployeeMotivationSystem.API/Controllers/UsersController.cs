@@ -23,6 +23,32 @@ public sealed class UsersController : BaseController
         if (user == null)
             throw new Exception($"User with id: {id} not found!");
 
+        int? companyId;
+        
+        // Чел админ
+        
+        var companiesByUser = await DbContext.Companies
+            .FirstOrDefaultAsync(el => el.CreatorUserId == id);
+
+        if (companiesByUser != null)
+        {
+            companyId = companiesByUser.Id;
+            
+            return new GetUserByIdResponseApiDto
+            {
+                Item = new UserApiDto
+                {
+                    Id = user.Id,
+                    CreationDate = user.CreationDate,
+                    Name = user.Name,
+                    Email = user.Email,
+                    CompanyId = companyId.Value
+                }
+            };
+        }
+        
+        // Чел мембер
+        
         var userCompany = await DbContext.CompaniesUsers
             .SingleOrDefaultAsync(el => el.UserId == id);
 

@@ -1,5 +1,6 @@
 using EmployeeMotivationSystem.API.Constants;
 using EmployeeMotivationSystem.API.Mapper;
+using EmployeeMotivationSystem.API.Middleware.Exceptions;
 using EmployeeMotivationSystem.DAL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -82,7 +83,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// app.UseMiddleware<ExceptionCatcherMiddleware>();
+app.UseMiddleware<ExceptionCatcherMiddleware>();
 
 app.UseHttpsRedirection();
 

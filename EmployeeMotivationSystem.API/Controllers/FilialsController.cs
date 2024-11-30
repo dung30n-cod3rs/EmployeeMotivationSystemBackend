@@ -104,6 +104,33 @@ public sealed class FilialsController : BaseController
         };
     }
 
+    [HttpPost]
+    public async Task<IActionResult> AddMemberToFilial([FromBody] AddMemberToFilialRequestApiDto request)
+    {
+        var filial = await DbContext.Filials
+            .SingleOrDefaultAsync(el => el.Id == request.FilialId);
+
+        if (filial == null)
+            throw new Exception($"Filial with id: {request.FilialId} not found!");
+        
+        var member = await DbContext.Users
+            .SingleOrDefaultAsync(el => el.Id == request.MemberId);
+
+        if (member == null)
+            throw new Exception($"Member with id: {request.FilialId} not found!");
+        
+        await DbContext.CompaniesUsersFilials
+            .AddAsync(new CompaniesUsersFilials
+            {
+                CompanyUserId = request.MemberId,
+                FilialId = request.FilialId,
+            });
+
+        await DbContext.SaveChangesAsync();
+
+        return Ok();
+    }
+    
     [HttpPut]
     public async Task<UpdateFilialResponseApiDto> UpdateFilial([FromBody] UpdateFilialRequestApiDto request)
     {

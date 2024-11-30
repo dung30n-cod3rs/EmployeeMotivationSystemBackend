@@ -1,4 +1,5 @@
-﻿using EmployeeMotivationSystem.API.Models.Users;
+﻿using EmployeeMotivationSystem.API.Models.Base;
+using EmployeeMotivationSystem.API.Models.Users;
 using EmployeeMotivationSystem.DAL;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,10 +23,13 @@ public sealed class UsersController : BaseController
         
         return new GetUserByIdResponseApiDto
         {
-            CreationDate = user.CreationDate,
-            Name = user.Name,
-            Email = user.Email,
-            Password = user.Password
+            Item = new UserApiDto
+            {
+                CreationDate = user.CreationDate,
+                Name = user.Name,
+                Email = user.Email,
+                Password = user.Password
+            }
         };
     }
     

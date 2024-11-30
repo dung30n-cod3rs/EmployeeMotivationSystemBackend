@@ -1,9 +1,8 @@
-﻿namespace EmployeeMotivationSystem.API.Models.Users;
+﻿using EmployeeMotivationSystem.API.Models.Base;
+
+namespace EmployeeMotivationSystem.API.Models.Users;
 
 public sealed record GetUserByIdResponseApiDto
 {
-    public required DateTime CreationDate { get; init; }
-    public required string Name { get; init; }
-    public required string Email { get; init; }
-    public required string Password { get; init; }
+    public required UserApiDto Item { get; init; }
 }

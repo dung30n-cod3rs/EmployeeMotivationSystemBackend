@@ -68,7 +68,7 @@ public sealed class CompaniesController : BaseController
     }
     
     [HttpGet("RatingByFilter")]
-    public async Task GetCompanyRatingById([FromBody] GetCompanyMetricsByIdRequestApiDto request)
+    public async Task<GetCompanyRatingByFilterResponseApiDto> GetCompanyRatingById([FromBody] GetCompanyMetricsByIdRequestApiDto request)
     {
         var metric = await DbContext.Metrics
             .SingleOrDefaultAsync(el => el.Id == request.MetricId);
@@ -77,59 +77,61 @@ public sealed class CompaniesController : BaseController
             throw new Exception($"Metric with id: {request.MetricId} not found!");
 
         var filial = await DbContext.Filials
+            .Include(filial => filial.Company)
             .SingleOrDefaultAsync(el => el.Id == request.FilialId);
 
         if (filial == null)
             throw new Exception($"Filial with id: {request.FilialId} not found!");
+        
+        var position = await DbContext.Filials
+            .SingleOrDefaultAsync(el => el.Id == request.PositionId);
 
-        // var a = Com
+        if (position == null)
+            throw new Exception($"Filial with id: {request.PositionId} not found!");
+
+        var membersOfCurrentFilial = await DbContext.CompaniesUsersFilials
+            .Include(el => el.CompanyUser)
+            .ThenInclude(el => el.User)
+            .Where(el => el.FilialId == filial.Id)
+            .Select(el => el.CompanyUser.User.Id)
+            .ToArrayAsync();
+
+        var values = await DbContext.CompaniesUsersMetrics
+            .Include(el => el.Metric)
+            .Include(el => el.Member)
+            .ThenInclude(el => el.User)
+            .Where(el => el.Metric.CreationDate >= request.CreationDateFrom)
+            .Where(el => el.Metric.CreationDate <= request.CreationDateTo)
+            .Where(el => membersOfCurrentFilial.Contains(el.MemberId))
+            .Select(el => new
+            {
+                Name = el.Member.User.Name,
+                TargetValue = el.Metric.TargetValue,
+                MemberValue = membersOfCurrentFilial.Count(k => k == el.MemberId)
+            })
+            .OrderBy(el => el.MemberValue)
+            .ToArrayAsync();
         
-        // var companiesUsersFilials = await DbContext.CompaniesUsersFilials
-        //     .Where(el => el.FilialId == request.FilialId)
-        //     .ToArrayAsync();
-        //
-        // var filialUsersIds = companiesUsersFilials
-        //     .Select(el => el.CompanyUser)
-        //     .ToArray();
-        //
-        // var a = await DbContext.CompaniesUsersMetrics
-        //     .Where(el => el.MetricId == request.MetricId)
-        //     .GroupBy(el => el.Member.Id)
-        //     .Select(g => new
-        //     {
-        //         g.Key,
-        //         Count = g.Count()
-        //     })
-        //     .ToArrayAsync();
-        //
-        // var b = a
-        //     .Join(
-        //         filialUsersIds, 
-        //         u => u.Key, 
-        //         g => g.UserId,
-        //         (u, g) => new
-        //         {
-        //             UserId = u.Key,
-        //             UserName = g.User.Name,
-        //             MetricsCount = u.Count
-        //         }
-        //     )
-        //     .ToArray();
-        
-        // TODO
-        
-        throw new NotImplementedException();
+        return new GetCompanyRatingByFilterResponseApiDto
+        {
+            Items = values.Select(el => new GetCompanyRatingByFilterResponseApiDto.GetCompanyRatingByFilterItemResponseApiDto
+            {
+                Name = el.Name,
+                TargetValue = el.TargetValue,
+                MemberValue = el.MemberValue
+            })
+        };
     }
     
-    // Место, Имя, TargetValue, значение сотрудника
     
-    [HttpGet("MetricsByFilter")]
-    public async Task<int> GetCompanyMetricsById([FromBody] GetCompanyRatingByIdRequestApiDto request)
-    {
-        // TODO
-        
-        throw new NotImplementedException();
-    }
+    
+    // [HttpGet("MetricsByFilter")]
+    // public async Task<int> GetCompanyMetricsById([FromBody] int request)
+    // {
+    //     // TODO
+    //     
+    //     throw new NotImplementedException();
+    // }
     
     [HttpGet("{id:int}/positions")]
     public async Task<GetCompanyPositionByIdResponseApiDto> GetCompanyPositionsById(int id)

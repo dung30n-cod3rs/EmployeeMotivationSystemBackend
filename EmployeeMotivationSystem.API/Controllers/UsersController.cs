@@ -51,7 +51,7 @@ public sealed class UsersController : BaseController
         
         return new GetUserMetricsByIdApiDto
         {
-            Items = companiesUsersMetrics.Select(el => new GetUserMetricsByIdApiDto.Item
+            Items = companiesUsersMetrics.Select(el => new GetUserMetricsByIdApiDto.GetUserMetricsByIdItemApiDto
             {
                 MetricId = el.MetricId,
                 MetricName = el.Metric.Name,

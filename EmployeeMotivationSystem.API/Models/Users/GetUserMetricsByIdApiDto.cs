@@ -2,9 +2,9 @@
 
 public sealed record GetUserMetricsByIdApiDto
 {
-    public IEnumerable<Item> Items { get; init; } = [];
+    public IEnumerable<GetUserMetricsByIdItemApiDto> Items { get; init; } = [];
 
-    public record Item
+    public record GetUserMetricsByIdItemApiDto
     {
         public required int MetricId { get; init; }
         public required string MetricName { get; init; }

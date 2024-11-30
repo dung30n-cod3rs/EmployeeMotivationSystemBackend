@@ -1,14 +1,26 @@
+using System.Net;
 using EmployeeMotivationSystem.API.Constants;
 using EmployeeMotivationSystem.API.Middleware.Exceptions;
 using EmployeeMotivationSystem.DAL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 
 const string connectionStringKey = "BaseStorage";
 const string dataAccessLayerAssemblyName = "EmployeeMotivationSystem.DAL";
 
 var builder = WebApplication.CreateBuilder();
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Listen(IPAddress.Any, 5000, listenOptions =>
+    {
+        options.Limits.MaxRequestBodySize = int.MaxValue;
+        
+        listenOptions.Protocols = HttpProtocols.Http1AndHttp2;
+    });
+    
+});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -50,15 +62,17 @@ app.UseCors(c =>
 });
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// if (app.Environment.IsDevelopment())
+// {
+//     
+// }
+
+app.UseSwagger();
+app.UseSwaggerUI(opt =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(opt =>
-    {
-        // opt.RoutePrefix = "/api";
-        // opt.SwaggerEndpoint("/swagger/v1/swagger.json", "Name");
-    });
-}
+    // opt.RoutePrefix = "/api";
+    // opt.SwaggerEndpoint("/swagger/v1/swagger.json", "Name");
+});
 
 app.UseMiddleware<ExceptionCatcherMiddleware>();
 
@@ -68,5 +82,14 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+
+    var context = services.GetRequiredService<AppDbContext>();
+    if (context.Database.GetPendingMigrations().Any())
+        context.Database.Migrate();
+}
 
 app.Run();

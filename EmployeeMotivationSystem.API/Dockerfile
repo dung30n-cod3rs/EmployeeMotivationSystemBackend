@@ -2,7 +2,6 @@
 USER $APP_UID
 WORKDIR /app
 EXPOSE 5000
-EXPOSE 5001
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -14,6 +13,10 @@ COPY . .
 WORKDIR "/src/EmployeeMotivationSystem.API"
 RUN dotnet build "EmployeeMotivationSystem.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
+#WORKDIR "/src/EmployeeMotivationSystem.DAL"
+#RUN dotnet tool install --global dotnet-ef
+#RUN dotnet ef
+
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "EmployeeMotivationSystem.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
@@ -21,4 +24,6 @@ RUN dotnet publish "EmployeeMotivationSystem.API.csproj" -c $BUILD_CONFIGURATION
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
 ENTRYPOINT ["dotnet", "EmployeeMotivationSystem.API.dll"]
+

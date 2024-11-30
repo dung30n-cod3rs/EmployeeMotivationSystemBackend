@@ -1,6 +1,38 @@
 ﻿services:
+  
+  postgres:
+    image: postgres:14-alpine
+    
+    restart: always
+    
+    environment:
+      - PGUSER=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DATABASE=employee-motivation-system
+      - PGDATABASE=employee-motivation-system
+    
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 1s
+      timeout: 5s
+      retries: 5
+    
+    ports:
+      - "5432:5432"
+    
   employee_motivation_system.api:
     image: employeemotivationsystem.api
+    
+    depends_on:
+      postgres:
+        condition: service_healthy
+    
+    restart: always
+
+    ports:
+      - "5000:5000"
+
     build:
       context: .
       dockerfile: EmployeeMotivationSystem.API/Dockerfile

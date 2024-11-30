@@ -1,10 +1,17 @@
 ﻿namespace EmployeeMotivationSystem.API.Models.Users;
 
-public sealed record GetUserMetricsByIdApiDto
+public sealed record GetUserMetricsByIdRequestApiDto
 {
-    public IEnumerable<GetUserMetricsByIdItemApiDto> Items { get; init; } = [];
+    public int UserId { get; init; }
+    public DateTime DateFrom { get; init; }
+    public DateTime DateTo { get; init; }
+}
 
-    public record GetUserMetricsByIdItemApiDto
+public sealed record GetUserMetricsByIdResponseApiDto
+{
+    public IEnumerable<GetUserMetricsByIdResponseItemApiDto> Items { get; init; } = [];
+
+    public record GetUserMetricsByIdResponseItemApiDto
     {
         public required int MetricId { get; init; }
         public required string MetricName { get; init; }
@@ -13,5 +20,6 @@ public sealed record GetUserMetricsByIdApiDto
         public required double TargetValue { get; init; }
         
         public required int Count { get; init; }
+        public required double Bonuses { get; init; }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using EmployeeMotivationSystem.API.Models.Base;
 using EmployeeMotivationSystem.API.Models.Users;
 using EmployeeMotivationSystem.DAL;
+using EmployeeMotivationSystem.DAL.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,31 +35,57 @@ public sealed class UsersController : BaseController
     }
     
     // TODO: Authorize
-    [HttpGet("{id:int}/Metrics")]
-    public async Task<GetUserMetricsByIdApiDto> GetUserMetricsById(int id)
+    [HttpGet("Metrics")]
+    public async Task<GetUserMetricsByIdResponseApiDto> GetUserMetricsById(GetUserMetricsByIdRequestApiDto request)
     {
         var user = await DbContext.Users
-            .SingleOrDefaultAsync(el => el.Id == id);
+            .SingleOrDefaultAsync(el => el.Id == request.UserId);
 
         if (user == null)
-            throw new Exception($"User with id: {id} not found!");
+            throw new Exception($"User with id: {request.UserId} not found!");
 
         var companiesUsersMetrics = await DbContext.CompaniesUsersMetrics
-            // .Include(el => el.Member)
-            // .Include(el => el.Metric)
+            .Include(el => el.Member)
+            .Include(el => el.Metric)
             .Where(el => el.Member.UserId == user.Id)
+            .Where(el => el.CreationDate > request.DateFrom)
+            .Where(el => el.CreationDate < request.DateTo)
             .ToArrayAsync();
-        
-        return new GetUserMetricsByIdApiDto
+
+        var anyCompanyUser = companiesUsersMetrics.FirstOrDefault();
+
+        if (anyCompanyUser == null)
         {
-            Items = companiesUsersMetrics.Select(el => new GetUserMetricsByIdApiDto.GetUserMetricsByIdItemApiDto
+            return new GetUserMetricsByIdResponseApiDto
+            {
+                Items = companiesUsersMetrics.Select(el => new GetUserMetricsByIdResponseApiDto.GetUserMetricsByIdResponseItemApiDto()
+                {
+                    MetricId = el.MetricId,
+                    MetricName = el.Metric.Name,
+                    MetricWeight = el.Metric.Weight,
+                    Description = el.Metric.Description,
+                    TargetValue = el.Metric.TargetValue,
+                
+                    Count = 0,
+                    Bonuses = 0
+                })
+            };
+        }
+        
+        var metricsCount = companiesUsersMetrics.Length;
+        
+        return new GetUserMetricsByIdResponseApiDto
+        {
+            Items = companiesUsersMetrics.Select(el => new GetUserMetricsByIdResponseApiDto.GetUserMetricsByIdResponseItemApiDto()
             {
                 MetricId = el.MetricId,
                 MetricName = el.Metric.Name,
                 MetricWeight = el.Metric.Weight,
                 Description = el.Metric.Description,
                 TargetValue = el.Metric.TargetValue,
-                Count = el.Count,
+                
+                Count = metricsCount,
+                Bonuses = CalculateBonuses(anyCompanyUser.Member, companiesUsersMetrics)
             })
         };
     }
@@ -105,5 +132,34 @@ public sealed class UsersController : BaseController
         await DbContext.SaveChangesAsync();
         
         return Ok();
+    }
+
+    // TODO: Move to BLL 100%
+    
+    private double CalculateBonuses(CompaniesUser user, IEnumerable<CompaniesUsersMetric> metrics)
+    {
+        var arrayedMetrics = metrics.ToArray();
+        
+        var totalBonus = 0d;
+
+        var maxBonus = user.Salary * 0.5;
+
+        foreach (var metric in arrayedMetrics)
+        {
+            var metricScore = CalculateMetricScore(metric.Metric, arrayedMetrics.Length);
+            var weightedScore = metricScore * metric.Metric.Weight;
+            totalBonus += weightedScore;
+        }
+
+        var normalizedBonuses = (totalBonus / 100) * maxBonus;
+
+        return normalizedBonuses;
+    }
+
+    private double CalculateMetricScore(Metric metric, int actualValue)
+    {
+        var score = (actualValue / metric.TargetValue) * 100;
+        
+        return Math.Min(score, 150);
     }
 }

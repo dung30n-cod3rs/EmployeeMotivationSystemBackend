@@ -7,6 +7,4 @@ public sealed record CompaniesUsersMetric : BaseModel
     
     public required int MemberId { get; init; }
     public required CompaniesUser Member { get; init; }
-    
-    public required int Count { get; init; }
 }

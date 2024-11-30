@@ -104,7 +104,7 @@ public sealed class FilialsController : BaseController
         };
     }
 
-    [HttpPost]
+    [HttpPost("AddMemberToFilial")]
     public async Task<IActionResult> AddMemberToFilial([FromBody] AddMemberToFilialRequestApiDto request)
     {
         var filial = await DbContext.Filials

@@ -64,8 +64,8 @@ public sealed class UsersController : BaseController
                         MetricId = el.MetricId,
                         MetricName = el.Metric.Name,
                         MetricWeight = el.Metric.Weight,
-                        Description = el.Metric.Description,
-                        TargetValue = el.Metric.TargetValue,
+                        MetricDescription = el.Metric.Description,
+                        MetricTargetValue = el.Metric.TargetValue,
 
                         Count = 0,
                         Bonuses = 0
@@ -83,8 +83,8 @@ public sealed class UsersController : BaseController
                     MetricId = el.MetricId,
                     MetricName = el.Metric.Name,
                     MetricWeight = el.Metric.Weight,
-                    Description = el.Metric.Description,
-                    TargetValue = el.Metric.TargetValue,
+                    MetricDescription = el.Metric.Description,
+                    MetricTargetValue = el.Metric.TargetValue,
 
                     Count = metricsCount,
                     Bonuses = CalculateBonuses(anyCompanyUser.Member, companiesUsersMetrics)

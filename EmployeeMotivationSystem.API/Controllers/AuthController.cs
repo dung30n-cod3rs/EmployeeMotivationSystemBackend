@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
 using EmployeeMotivationSystem.API.Constants;
-using EmployeeMotivationSystem.API.Models;
 using EmployeeMotivationSystem.API.Models.Auth;
 using EmployeeMotivationSystem.DAL;
 using EmployeeMotivationSystem.DAL.Models;

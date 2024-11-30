@@ -60,14 +60,14 @@ public sealed class CompaniesController : BaseController
         throw new NotImplementedException();
     }
     
-    [HttpPost("{id:int}/member/{memberId:int}")]
-    public async Task<CreateCompanyResponseApiDto> UpdateCompanyMember(int id, int memberId)
+    [HttpPut("{companyId:int}/member/{memberId:int}")]
+    public async Task<CreateCompanyResponseApiDto> UpdateCompanyMember(int companyId, int memberId)
     {
         throw new NotImplementedException();
     }
     
-    [HttpDelete("{id:int}/member/{memberId:int}")]
-    public async Task DeleteCompanyMember(int id, int memberId)
+    [HttpDelete("{companyId:int}/member/{memberId:int}")]
+    public async Task DeleteCompanyMember(int companyId, int memberId)
     {
         throw new NotImplementedException();
     }

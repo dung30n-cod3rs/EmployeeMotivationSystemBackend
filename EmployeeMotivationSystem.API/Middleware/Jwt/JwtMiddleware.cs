@@ -22,7 +22,7 @@ public sealed class JwtMiddleware : ActionFilterAttribute
         var handler = new JwtSecurityTokenHandler();
         var validations = new AppTokenValidationParameters();
 
-        SecurityToken? validatedToken;
+        SecurityToken? validatedToken = null;
         
         try
         {
@@ -31,8 +31,7 @@ public sealed class JwtMiddleware : ActionFilterAttribute
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
-            throw;
+            // ignored
         }
         
         var jwtToken = validatedToken as JwtSecurityToken;

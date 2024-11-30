@@ -69,7 +69,7 @@ public sealed class CompaniesController : BaseController
     }
     
     [HttpPost("RatingByFilter")]
-    public async Task<GetCompanyRatingByFilterResponseApiDto> GetCompanyRatingById([FromBody] GetCompanyMetricsByIdRequestApiDto request)
+    public async Task<GetCompanyRatingByFilterResponseApiDto> GetCompanyRatingById([FromBody] GetCompanyRatingByFilterRequestApiDto request)
     {
         var metric = await DbContext.Metrics
             .SingleOrDefaultAsync(el => el.Id == request.MetricId);
@@ -124,15 +124,54 @@ public sealed class CompaniesController : BaseController
         };
     }
     
-    
-    
-    // [HttpGet("MetricsByFilter")]
-    // public async Task<int> GetCompanyMetricsById([FromBody] int request)
-    // {
-    //     // TODO
-    //     
-    //     throw new NotImplementedException();
-    // }
+    [HttpGet("MetricsByFilter")]
+    public async Task<GetCompanyMetricsByIdResponseApiDto> GetCompanyMetricsById([FromBody] GetCompanyMetricsByIdRequestApiDto request)
+    {
+        var company = await DbContext.Companies
+            .SingleOrDefaultAsync(el => el.Id == request.CompanyId);
+
+        if (company == null)
+            throw new Exception($"Company with id: {request.CompanyId} not found!");
+        
+        var position = await DbContext.Filials
+            .SingleOrDefaultAsync(el => el.Id == request.PositionId);
+
+        if (position == null)
+            throw new Exception($"Filial with id: {request.PositionId} not found!");
+
+        var currentCompanyPositionsIds = await DbContext.Positions
+            .Include(el => el.Company)
+            .Where(el => el.CompanyId == request.CompanyId)
+            .Select(el => el.Id)
+            .ToArrayAsync();
+
+        var currentCompanyMetricsByPositions = await DbContext.Metrics
+            .Where(el => currentCompanyPositionsIds.Contains(el.Id))
+            .ToArrayAsync();
+
+        return new GetCompanyMetricsByIdResponseApiDto()
+        {
+            Items = currentCompanyMetricsByPositions.Select(el => new MetricApiDto
+            {
+                CreationDate = el.CreationDate,
+                Name = el.Name,
+                Weight = el.Weight,
+                Description = el.Description,
+                TargetValue = el.TargetValue,
+                Position = new PositionApiDto
+                {
+                    CreationDate = el.Position.CreationDate,
+                    Name = el.Position.Name,
+                    Weight = el.Position.Weight,
+                    Company = new CompanyApiDto
+                    {
+                        CreationDate = el.Position.Company.CreationDate,
+                        Name = el.Position.Company.Name
+                    }
+                }
+            })
+        };
+    }
     
     [HttpGet("{id:int}/positions")]
     public async Task<GetCompanyPositionByIdResponseApiDto> GetCompanyPositionsById(int id)

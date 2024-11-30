@@ -35,7 +35,7 @@ public sealed class UsersController : BaseController
         };
     }
     
-    [HttpGet("Metrics")]
+    [HttpPost("Metrics")]
     public async Task<GetUserMetricsByIdResponseApiDto> GetUserMetricsById(GetUserMetricsByIdRequestApiDto request)
     {
         var user = await DbContext.Users

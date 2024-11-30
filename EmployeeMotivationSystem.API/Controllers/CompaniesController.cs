@@ -68,7 +68,7 @@ public sealed class CompaniesController : BaseController
         };
     }
     
-    [HttpGet("RatingByFilter")]
+    [HttpPost("RatingByFilter")]
     public async Task<GetCompanyRatingByFilterResponseApiDto> GetCompanyRatingById([FromBody] GetCompanyMetricsByIdRequestApiDto request)
     {
         var metric = await DbContext.Metrics

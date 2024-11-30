@@ -35,11 +35,6 @@ public sealed class CompaniesController : BaseController
             }
         };
     }
-
-    public class TestObj
-    {
-        public int Cock { get; set; }
-    }
     
     [HttpGet("{id:int}/members")]
     public async Task<GetCompanyMembersByIdResponseApiDto> GetCompanyMembersById(int id)
@@ -130,8 +125,6 @@ public sealed class CompaniesController : BaseController
         };
     }
     
-    // Таблица метрик юзера
-    
     [HttpPost("MetricsByFilter")]
     public async Task<GetCompanyMetricsByIdResponseApiDto> GetCompanyMetricsById([FromBody] GetCompanyMetricsByIdRequestApiDto request)
     {
@@ -214,6 +207,24 @@ public sealed class CompaniesController : BaseController
     [HttpGet("{id:int}/positions")]
     public async Task<GetCompanyPositionByIdResponseApiDto> GetCompanyPositionsById(int id)
     {
+        if (HttpContext.Items[JwtMiddleware.JwtTokenHttpContextKey] is not string userEmail)
+            throw new Exception("Very strange. Your email is null. I think something its broken.");
+
+        var userFromJwt = await DbContext.Users
+            .SingleOrDefaultAsync(el => el.Email == userEmail);
+
+        if (userFromJwt == null)
+            throw new Exception("User from jwt is bad, its not good.");
+
+        var userFromJwtCompanies = await DbContext.CompaniesUsers
+            .Include(companiesUser => companiesUser.Position)
+            .SingleOrDefaultAsync(el => el.UserId == userFromJwt.Id);
+
+        if (userFromJwtCompanies == null)
+            throw new Exception($"Member with id = {userFromJwt.Id} not found!");
+
+        var positionWeight = userFromJwtCompanies.Position.Weight;
+        
         var company = await DbContext.Companies
             .SingleOrDefaultAsync(el => el.Id == id);
 
@@ -222,6 +233,7 @@ public sealed class CompaniesController : BaseController
 
         var positions = await DbContext.Positions
             .Where(el => el.CompanyId == company.Id)
+            .Where(el => el.Weight <= positionWeight)
             .ToArrayAsync();
 
         return new GetCompanyPositionByIdResponseApiDto

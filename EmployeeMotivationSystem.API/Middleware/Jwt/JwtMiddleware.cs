@@ -1,7 +1,10 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using EmployeeMotivationSystem.API.Constants;
+using EmployeeMotivationSystem.DAL;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace EmployeeMotivationSystem.API.Middleware.Jwt;
@@ -40,5 +43,4 @@ public sealed class JwtMiddleware : ActionFilterAttribute
 
         context.HttpContext.Items[JwtTokenHttpContextKey] = email;
     }
-    
 }

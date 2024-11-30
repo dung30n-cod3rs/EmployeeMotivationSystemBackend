@@ -182,6 +182,23 @@ public sealed class CompaniesController : BaseController
         };
     }
     
+    [HttpPost("AddMetricToMember")]
+    public async Task<AddMetricToMemberResponseApiDto> AddMetricToMember([FromBody] AddMetricToMemberRequestApiDto request)
+    {
+        await DbContext.CompaniesUsersMetrics.AddRangeAsync(request.Items.Select(el => new CompaniesUsersMetric
+        {
+            MetricId = el.MetricId,
+            MemberId = el.MemberId
+        }));
+
+        await DbContext.SaveChangesAsync();
+        
+        return new AddMetricToMemberResponseApiDto
+        {
+            AffectedRows = request.Items.Count()
+        };
+    }
+    
     [HttpGet("{id:int}/positions")]
     public async Task<GetCompanyPositionByIdResponseApiDto> GetCompanyPositionsById(int id)
     {

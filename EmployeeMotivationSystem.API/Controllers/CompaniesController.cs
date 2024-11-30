@@ -238,6 +238,25 @@ public sealed class CompaniesController : BaseController
         });
 
         await DbContext.SaveChangesAsync();
+        
+        var newPosition = await DbContext.Positions.AddAsync(new Position
+        {
+            Name = "Тех. Администратор",
+            Weight = 0,
+            CompanyId = newCompany.Entity.Id
+        });
+        
+        await DbContext.SaveChangesAsync();
+        
+        await DbContext.CompaniesUsers.AddAsync(new CompaniesUser
+        {
+            CompanyId = newCompany.Entity.Id,
+            UserId = user.Id,
+            PositionId = newPosition.Entity.Id,
+            Salary = 0
+        });
+        
+        await DbContext.SaveChangesAsync();
 
         return new CreateCompanyResponseApiDto
         {

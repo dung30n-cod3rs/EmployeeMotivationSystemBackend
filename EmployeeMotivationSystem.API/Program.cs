@@ -1,5 +1,4 @@
 using EmployeeMotivationSystem.API.Constants;
-using EmployeeMotivationSystem.API.Mapper;
 using EmployeeMotivationSystem.API.Middleware.Exceptions;
 using EmployeeMotivationSystem.DAL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -33,8 +32,6 @@ builder.Services
             sqlServerOptionsBuilder 
                 => sqlServerOptionsBuilder.MigrationsAssembly(dataAccessLayerAssemblyName))
 );
-
-builder.Services.RegisterMapsterConfiguration();
 
 builder.Services.AddAuthorization();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

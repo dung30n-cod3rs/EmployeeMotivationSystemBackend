@@ -21,7 +21,7 @@ public static class AppAuthOptions
             issuer: Issuer,
             audience: Audience,
             claims: claims,
-            expires: DateTime.UtcNow.Add(TimeSpan.FromMinutes(5)),
+            expires: DateTime.UtcNow.AddDays(7), // TODO: 7 days -> 30min (front)
             signingCredentials: new SigningCredentials(SymmetricSecurityKey, SecurityAlgorithms.HmacSha256));
             
         return new JwtSecurityTokenHandler().WriteToken(jwt);

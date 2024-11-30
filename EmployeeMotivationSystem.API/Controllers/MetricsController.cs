@@ -13,6 +13,48 @@ public sealed class MetricsController : BaseController
 {
     public MetricsController(AppDbContext dbContext) 
         : base(dbContext) { }
+
+    [HttpGet("GetAvailableMetricsByPositionId/{id:int}")]
+    public async Task<GetAvailableMetricsByPositionResponseIdApiDto> GetAvailableMetricsByPositionId(int id)
+    {
+        var position = await DbContext.Positions
+            .SingleOrDefaultAsync(el => el.Id == id);
+
+        if (position == null)
+            throw new Exception($"Metric with id: {id} not found!");
+
+        var metrics = await DbContext.Metrics
+            .Include(el => el.Position)
+            .ThenInclude(el => el.Company)
+            .Where(el => el.PositionId == id)
+            .ToArrayAsync();
+
+        return new GetAvailableMetricsByPositionResponseIdApiDto()
+        {
+            Items = metrics.Select(el => new MetricApiDto
+            {
+                Id = el.Id,
+                CreationDate = el.CreationDate,
+                Name = el.Name,
+                Weight = el.Weight,
+                Description = el.Description,
+                TargetValue = el.TargetValue,
+                Position = new PositionApiDto
+                {
+                    Id = el.Position.Id,
+                    CreationDate = el.Position.CreationDate,
+                    Name = el.Position.Name,
+                    Weight = el.Position.Weight,
+                    Company = new CompanyApiDto
+                    {
+                        Id = el.Position.Company.Id,
+                        CreationDate = el.Position.Company.CreationDate,
+                        Name = el.Position.Company.Name
+                    }
+                }
+            })
+        };
+    }
     
     [HttpPost]
     public async Task<AddMetricResponseApiDto> AddMetric([FromBody] AddMetricRequestApiDto request)

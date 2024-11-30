@@ -9,4 +9,6 @@ public sealed record Company : BaseModel
     
     public int? CreatorUserId { get; init; }
     public User? CreatorUser { get; init; }
+
+    public List<Filial> Filials { get; init; } = [];
 }

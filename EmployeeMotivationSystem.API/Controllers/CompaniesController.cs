@@ -67,17 +67,69 @@ public sealed class CompaniesController : BaseController
         };
     }
     
-    // [HttpGet("{id:int}/rating")] filter?
-    // public async Task<int> GetCompanyRatingById(int id)
-    // {
-    //     throw new NotImplementedException();
-    // }
+    [HttpGet("RatingByFilter")]
+    public async Task GetCompanyRatingById([FromBody] GetCompanyMetricsByIdRequestApiDto request)
+    {
+        var metric = await DbContext.Metrics
+            .SingleOrDefaultAsync(el => el.Id == request.MetricId);
+
+        if (metric == null)
+            throw new Exception($"Metric with id: {request.MetricId} not found!");
+
+        var filial = await DbContext.Filials
+            .SingleOrDefaultAsync(el => el.Id == request.FilialId);
+
+        if (filial == null)
+            throw new Exception($"Filial with id: {request.FilialId} not found!");
+
+        // var a = Com
+        
+        // var companiesUsersFilials = await DbContext.CompaniesUsersFilials
+        //     .Where(el => el.FilialId == request.FilialId)
+        //     .ToArrayAsync();
+        //
+        // var filialUsersIds = companiesUsersFilials
+        //     .Select(el => el.CompanyUser)
+        //     .ToArray();
+        //
+        // var a = await DbContext.CompaniesUsersMetrics
+        //     .Where(el => el.MetricId == request.MetricId)
+        //     .GroupBy(el => el.Member.Id)
+        //     .Select(g => new
+        //     {
+        //         g.Key,
+        //         Count = g.Count()
+        //     })
+        //     .ToArrayAsync();
+        //
+        // var b = a
+        //     .Join(
+        //         filialUsersIds, 
+        //         u => u.Key, 
+        //         g => g.UserId,
+        //         (u, g) => new
+        //         {
+        //             UserId = u.Key,
+        //             UserName = g.User.Name,
+        //             MetricsCount = u.Count
+        //         }
+        //     )
+        //     .ToArray();
+        
+        // TODO
+        
+        throw new NotImplementedException();
+    }
     
-    // [HttpGet("{id:int}/rating")] filter?
-    // public async Task<int> GetCompanyMetricsById(int id)
-    // {
-    //     throw new NotImplementedException();
-    // }
+    // Место, Имя, TargetValue, значение сотрудника
+    
+    [HttpGet("MetricsByFilter")]
+    public async Task<int> GetCompanyMetricsById([FromBody] GetCompanyRatingByIdRequestApiDto request)
+    {
+        // TODO
+        
+        throw new NotImplementedException();
+    }
     
     [HttpGet("{id:int}/positions")]
     public async Task<GetCompanyPositionByIdResponseApiDto> GetCompanyPositionsById(int id)

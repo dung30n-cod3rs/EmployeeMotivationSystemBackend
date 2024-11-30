@@ -2,5 +2,5 @@
 
 public sealed record DeleteMetricRequestApiDto
 {
-    public required int MetricId { get; init; }
+    public required int Id { get; init; }
 }

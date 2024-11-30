@@ -21,7 +21,7 @@ public sealed class UsersController : BaseController
             .SingleOrDefaultAsync(el => el.Id == id);
 
         if (user == null)
-            throw new Exception($"User with id: {id}");
+            throw new Exception($"User with id: {id} not found!");
         
         return new GetUserByIdResponseApiDto
         {

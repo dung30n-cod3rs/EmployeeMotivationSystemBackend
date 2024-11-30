@@ -123,7 +123,7 @@ public sealed class AuthController : BaseController
         {
             User = user,
             Token = refreshToken,
-            ExpiresAt = DateTime.UtcNow.AddDays(30)
+            ExpiresAt = DateTime.UtcNow.AddDays(30) // TODO: 30д стоит для теста, поставить 15мин.
         });
         
         await DbContext.SaveChangesAsync();

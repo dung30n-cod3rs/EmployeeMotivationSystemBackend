@@ -109,10 +109,10 @@ public sealed class MetricsController : BaseController
     public async Task<IActionResult> DeletePosition([FromBody] DeleteMetricRequestApiDto request)
     {
         var metric = await DbContext.Metrics
-            .SingleOrDefaultAsync(el => el.Id == request.MetricId);
+            .SingleOrDefaultAsync(el => el.Id == request.Id);
 
         if (metric == null)
-            throw new Exception($"Metric with id: {request.MetricId} not found!");
+            throw new Exception($"Metric with id: {request.Id} not found!");
 
         DbContext.Metrics.Remove(metric);
         

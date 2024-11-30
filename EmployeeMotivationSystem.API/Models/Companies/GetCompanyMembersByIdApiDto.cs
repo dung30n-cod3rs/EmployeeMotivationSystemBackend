@@ -17,6 +17,6 @@ public sealed record GetCompanyMembersByIdResponseApiDto
         public required string PositionName { get; init; }
         public required int PositionWeight { get; init; }
         
-        public required int Salary { get; init; }
+        public required double Salary { get; init; }
     }
 }

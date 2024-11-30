@@ -10,7 +10,7 @@ public sealed class JwtMiddleware : ActionFilterAttribute
 {
     public const string JwtTokenHttpContextKey = "JwtToken";
     
-    public override async void OnActionExecuting(ActionExecutingContext context)
+    public override void OnActionExecuting(ActionExecutingContext context)
     {
         string? authToken = context.HttpContext.Request.Headers.Authorization;
         

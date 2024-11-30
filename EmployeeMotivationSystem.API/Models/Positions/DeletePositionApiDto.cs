@@ -2,10 +2,5 @@
 
 public sealed record DeletePositionRequestApiDto
 {
-    
-}
-
-public sealed record DeletePositionResponseApiDto
-{
-    
+    public int Id { get; init; }
 }

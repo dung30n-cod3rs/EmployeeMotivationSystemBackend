@@ -58,45 +58,40 @@ public sealed class UsersController : BaseController
         {
             return new GetUserMetricsByIdResponseApiDto
             {
-                Items = companiesUsersMetrics.Select(el => new GetUserMetricsByIdResponseApiDto.GetUserMetricsByIdResponseItemApiDto()
+                Items = companiesUsersMetrics.Select(el =>
+                    new GetUserMetricsByIdResponseApiDto.GetUserMetricsByIdResponseItemApiDto()
+                    {
+                        MetricId = el.MetricId,
+                        MetricName = el.Metric.Name,
+                        MetricWeight = el.Metric.Weight,
+                        Description = el.Metric.Description,
+                        TargetValue = el.Metric.TargetValue,
+
+                        Count = 0,
+                        Bonuses = 0
+                    })
+            };
+        }
+
+        var metricsCount = companiesUsersMetrics.Length;
+
+        return new GetUserMetricsByIdResponseApiDto
+        {
+            Items = companiesUsersMetrics.Select(el =>
+                new GetUserMetricsByIdResponseApiDto.GetUserMetricsByIdResponseItemApiDto()
                 {
                     MetricId = el.MetricId,
                     MetricName = el.Metric.Name,
                     MetricWeight = el.Metric.Weight,
                     Description = el.Metric.Description,
                     TargetValue = el.Metric.TargetValue,
-                
-                    Count = 0,
-                    Bonuses = 0
+
+                    Count = metricsCount,
+                    Bonuses = CalculateBonuses(anyCompanyUser.Member, companiesUsersMetrics)
                 })
-            };
-        }
-        
-        var metricsCount = companiesUsersMetrics.Length;
-        
-        return new GetUserMetricsByIdResponseApiDto
-        {
-            Items = companiesUsersMetrics.Select(el => new GetUserMetricsByIdResponseApiDto.GetUserMetricsByIdResponseItemApiDto()
-            {
-                MetricId = el.MetricId,
-                MetricName = el.Metric.Name,
-                MetricWeight = el.Metric.Weight,
-                Description = el.Metric.Description,
-                TargetValue = el.Metric.TargetValue,
-                
-                Count = metricsCount,
-                Bonuses = CalculateBonuses(anyCompanyUser.Member, companiesUsersMetrics)
-            })
         };
     }
-    
-    // TODO: Authorize
-    [HttpGet("{id:int}/Bonus")]
-    public async Task<int> GetUserBonus(int id)
-    {
-        return 1; // TODO: ?
-    }
-    
+
     [HttpPost("ChangePassword")]
     public async Task<IActionResult> ChangeUserPassword([FromBody] ChangeUserPasswordRequestApiDto request)
     {

@@ -1,0 +1,6 @@
+﻿services:
+  employee_motivation_system.api:
+    image: employeemotivationsystem.api
+    build:
+      context: .
+      dockerfile: EmployeeMotivationSystem.API/Dockerfile

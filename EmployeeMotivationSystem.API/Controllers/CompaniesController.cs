@@ -141,15 +141,61 @@ public sealed class CompaniesController : BaseController
         };
     }
     
-    [HttpPut("{companyId:int}/member/{memberId:int}")]
-    public async Task<CreateCompanyResponseApiDto> UpdateCompanyMember(int companyId, int memberId)
+    [HttpPut("UpdateCompanyMember")]
+    public async Task<IActionResult> UpdateCompanyMember([FromForm] UpdateCompanyMemberRequestApiDto request)
     {
-        throw new NotImplementedException();
+        var companiesUser = await DbContext.CompaniesUsers
+            .SingleOrDefaultAsync(el => 
+                el.CompanyId == request.CompanyId
+                && el.PositionId == request.PositionId
+                && el.UserId == request.MemberId
+            );
+        
+        if (companiesUser == null)
+            throw new Exception($"" +
+                                $"CompanyUser by " +
+                                $"companyId: {request.CompanyId}, " +
+                                $"positionId: {request.PositionId} " +
+                                $"memberId: {request.MemberId}" +
+                                $"not found!");
+
+        companiesUser.CompanyId = request.CompanyId;
+        companiesUser.UserId = request.MemberId;
+        companiesUser.PositionId = request.PositionId;
+
+        await DbContext.SaveChangesAsync();
+
+        return Ok();
     }
     
     [HttpDelete("{companyId:int}/member/{memberId:int}")]
     public async Task DeleteCompanyMember(int companyId, int memberId)
     {
-        throw new NotImplementedException();
+        var company = await DbContext.Companies
+            .SingleOrDefaultAsync(el => el.Id == companyId);
+
+        if (company == null)
+            throw new Exception($"Company with id: {companyId} not found!");
+
+        // Is that cascade?
+        
+        // var companyMember = await DbContext.CompaniesUsers
+        //     .SingleOrDefaultAsync(el =>
+        //         el.CompanyId == companyId
+        //         && el.UserId == memberId
+        //     );
+
+        // if (companyMember == null)
+        //     throw new Exception($"Member with id: {memberId} not found!");
+        
+        var user = await DbContext.Users
+            .SingleOrDefaultAsync(el => el.Id == memberId);
+
+        if (user == null)
+            throw new Exception($"Member with id: {memberId} not found!");
+
+        DbContext.Users.Remove(user);
+
+        await DbContext.SaveChangesAsync();
     }
 }

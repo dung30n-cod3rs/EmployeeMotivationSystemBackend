@@ -11,7 +11,7 @@ namespace EmployeeMotivationSystem.API.Middleware.Auth;
 
 public sealed class AuthenticationAttribute : ActionFilterAttribute
 {
-    public override async void OnActionExecuting(ActionExecutingContext context)
+    public override void OnActionExecuting(ActionExecutingContext context)
     {
         // string? authToken = context.HttpContext.Request.Headers.Authorization;
         //

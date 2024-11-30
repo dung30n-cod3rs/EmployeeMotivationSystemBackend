@@ -29,7 +29,7 @@ public sealed class JwtMiddleware : ActionFilterAttribute
             handler.ValidateToken(authToken, validations, out var outSecurityToken);
             validatedToken = outSecurityToken;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             // ignored
         }

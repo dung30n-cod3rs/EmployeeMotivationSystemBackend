@@ -29,6 +29,7 @@ public sealed class CompaniesController : BaseController
         {
             Item = new CompanyApiDto
             {
+                Id = company.Id,
                 CreationDate = company.CreationDate,
                 Name = company.Name
             }
@@ -153,6 +154,7 @@ public sealed class CompaniesController : BaseController
         {
             Items = currentCompanyMetricsByPositions.Select(el => new MetricApiDto
             {
+                Id = el.Id,
                 CreationDate = el.CreationDate,
                 Name = el.Name,
                 Weight = el.Weight,
@@ -160,11 +162,13 @@ public sealed class CompaniesController : BaseController
                 TargetValue = el.TargetValue,
                 Position = new PositionApiDto
                 {
+                    Id = el.Position.Id,
                     CreationDate = el.Position.CreationDate,
                     Name = el.Position.Name,
                     Weight = el.Position.Weight,
                     Company = new CompanyApiDto
                     {
+                        Id = el.Position.Company.Id,
                         CreationDate = el.Position.Company.CreationDate,
                         Name = el.Position.Company.Name
                     }
@@ -190,11 +194,13 @@ public sealed class CompaniesController : BaseController
         {
             Items = positions.Select(el => new PositionApiDto
             {
+                Id = el.Id,
                 CreationDate = el.CreationDate,
                 Name = el.Name,
                 Weight = el.Weight,
                 Company = new CompanyApiDto
                 {
+                    Id = el.Company.Id,
                     CreationDate = el.Company.CreationDate,
                     Name = el.Company.Name
                 }
@@ -232,6 +238,7 @@ public sealed class CompaniesController : BaseController
         {
             Item = new CompanyApiDto
             {
+                Id = newCompany.Entity.Id,
                 CreationDate = newCompany.Entity.CreationDate,
                 Name = newCompany.Entity.Name
             }

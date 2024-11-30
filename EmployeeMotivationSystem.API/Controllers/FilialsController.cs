@@ -28,11 +28,13 @@ public sealed class FilialsController : BaseController
         {
             Item = new FilialApiDto
             {
+                Id = filial.Id,
                 CreationDate = filial.CreationDate,
                 Name = filial.Name,
                 Address = filial.Address,
                 Company = new CompanyApiDto
                 {
+                    Id = filial.Id,
                     CreationDate = filial.Company.CreationDate,
                     Name = filial.Company.Name
                 }
@@ -52,11 +54,13 @@ public sealed class FilialsController : BaseController
         {
             Items = filials.Select(el => new FilialApiDto
             {
+                Id = el.Id,
                 CreationDate = el.CreationDate,
                 Name = el.Name,
                 Address = el.Address,
                 Company = new CompanyApiDto
                 {
+                    Id = el.Company.Id,
                     CreationDate = el.Company.CreationDate,
                     Name = el.Company.Name
                 }
@@ -86,11 +90,13 @@ public sealed class FilialsController : BaseController
         {
             Item = new FilialApiDto
             {
+                Id = newFilial.Entity.Id,
                 CreationDate = newFilial.Entity.CreationDate,
                 Name = newFilial.Entity.Name,
                 Address = newFilial.Entity.Address,
                 Company = new CompanyApiDto
                 {
+                    Id = company.Id,
                     CreationDate = company.CreationDate,
                     Name = company.Name
                 }
@@ -123,11 +129,13 @@ public sealed class FilialsController : BaseController
         {
             Item = new FilialApiDto
             {
+                Id = filial.Id,
                 CreationDate = filial.CreationDate,
                 Name = filial.Name,
                 Address = filial.Address,
                 Company = new CompanyApiDto
                 {
+                    Id = company.Id,
                     CreationDate = company.CreationDate,
                     Name = company.Name
                 }

@@ -39,6 +39,7 @@ public sealed class MetricsController : BaseController
         {
             Item = new MetricApiDto
             {
+                Id = newMetric.Entity.Id,
                 CreationDate = newMetric.Entity.CreationDate,
                 Name = newMetric.Entity.Name,
                 Weight = newMetric.Entity.Weight,
@@ -46,11 +47,13 @@ public sealed class MetricsController : BaseController
                 TargetValue = newMetric.Entity.TargetValue,
                 Position = new PositionApiDto
                 {
+                    Id = position.Id,
                     CreationDate = position.CreationDate,
                     Name = position.Name,
                     Weight = position.Weight,
                     Company = new CompanyApiDto
                     {
+                        Id = position.Company.Id,
                         CreationDate = position.Company.CreationDate,
                         Name = position.Company.Name
                     }
@@ -87,6 +90,7 @@ public sealed class MetricsController : BaseController
         {
             Item = new MetricApiDto
             {
+                Id = metric.Id,
                 CreationDate = metric.CreationDate,
                 Name = metric.Name,
                 Weight = metric.Weight,
@@ -94,11 +98,13 @@ public sealed class MetricsController : BaseController
                 TargetValue = metric.TargetValue,
                 Position = new PositionApiDto
                 {
+                    Id = position.Id,
                     CreationDate = position.CreationDate,
                     Name = position.Name,
                     Weight = position.Weight,
                     Company = new CompanyApiDto
                     {
+                        Id = position.Company.Id,
                         CreationDate = position.Company.CreationDate,
                         Name = position.Company.Name
                     }

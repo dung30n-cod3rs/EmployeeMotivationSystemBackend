@@ -36,12 +36,14 @@ public sealed class PositionsController : BaseController
         {
             Item = new PositionApiDto
             {
+                Id = newPosition.Entity.Id,
                 CreationDate = newPosition.Entity.CreationDate,
                 Name = newPosition.Entity.Name,
                 Weight = newPosition.Entity.Weight,
                 
                 Company = new CompanyApiDto
                 {
+                    Id = company.Id,
                     CreationDate = company.CreationDate,
                     Name = company.Name
                 }
@@ -74,12 +76,14 @@ public sealed class PositionsController : BaseController
         {
             Item = new PositionApiDto
             {
+                Id = position.Id,
                 CreationDate = position.CreationDate,
                 Name = position.Name,
                 Weight = position.Weight,
                 
                 Company = new CompanyApiDto
                 {
+                    Id = company.Id,
                     CreationDate = company.CreationDate,
                     Name = company.Name
                 }

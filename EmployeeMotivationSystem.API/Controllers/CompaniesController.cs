@@ -130,7 +130,7 @@ public sealed class CompaniesController : BaseController
         };
     }
     
-    [HttpGet("MetricsByFilter")]
+    [HttpPost("MetricsByFilter")]
     public async Task<GetCompanyMetricsByIdResponseApiDto> GetCompanyMetricsById([FromBody] GetCompanyMetricsByIdRequestApiDto request)
     {
         var company = await DbContext.Companies

@@ -1,6 +1,8 @@
-﻿using EmployeeMotivationSystem.API.Models.Base;
+﻿using EmployeeMotivationSystem.API.Middleware.Jwt;
+using EmployeeMotivationSystem.API.Models.Base;
 using EmployeeMotivationSystem.API.Models.Companies;
 using EmployeeMotivationSystem.DAL;
+using EmployeeMotivationSystem.DAL.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -33,9 +35,36 @@ public sealed class CompaniesController : BaseController
     }
 
     [HttpGet("{id:int}/members")]
-    public async Task<int> GetCompanyMembersById(int id)
+    public async Task<GetCompanyMembersByIdResponseApiDto> GetCompanyMembersById(int id)
     {
-        throw new NotImplementedException();
+        var company = await DbContext.Companies
+            .SingleOrDefaultAsync(el => el.Id == id);
+
+        if (company == null)
+            throw new Exception($"Company with id: {id} not found!");
+
+        var members = await DbContext.CompaniesUsers
+            .Include(el => el.Company)
+            .Include(el => el.User)
+            .Include(el => el.Position)
+            .Where(el => el.CompanyId == id)
+            .ToArrayAsync();
+
+        return new GetCompanyMembersByIdResponseApiDto()
+        {
+            Items = members.Select(el => new GetCompanyMembersByIdResponseApiDto.GetCompanyMembersByIdItemResponseApiDto
+            {
+                CompanyCreationDate = el.Company.CreationDate,
+                CompanyName = el.Company.Name,
+                UserCreationDate = el.User.CreationDate,
+                UserName = el.User.Name,
+                UserEmail = el.User.Email,
+                PositionCreationDate = el.Position.CreationDate,
+                PositionName = el.Position.Name,
+                PositionWeight = el.Position.Weight,
+                Salary = el.Salary
+            })
+        };
     }
     
     // [HttpGet("{id:int}/rating")] filter?
@@ -51,15 +80,65 @@ public sealed class CompaniesController : BaseController
     // }
     
     [HttpGet("{id:int}/positions")]
-    public async Task<int> GetCompanyPositionsById(int id)
+    public async Task<GetCompanyPositionByIdResponseApiDto> GetCompanyPositionsById(int id)
     {
-        throw new NotImplementedException();
+        var company = await DbContext.Companies
+            .SingleOrDefaultAsync(el => el.Id == id);
+
+        if (company == null)
+            throw new Exception($"Company with id: {id} not found!");
+
+        var positions = await DbContext.Positions
+            .Where(el => el.CompanyId == company.Id)
+            .ToArrayAsync();
+
+        return new GetCompanyPositionByIdResponseApiDto
+        {
+            Items = positions.Select(el => new PositionApiDto
+            {
+                PositionCreationDate = el.CreationDate,
+                PositionName = el.Name,
+                PositionWeight = el.Weight,
+                CompanyCreationDate = el.Company.CreationDate,
+                CompanyName = el.Company.Name
+            })
+        };
     }
     
     [HttpPost]
     public async Task<CreateCompanyResponseApiDto> CreateCompany([FromBody] CreateCompanyRequestApiDto request)
     {
-        throw new NotImplementedException();
+        if (HttpContext.Items[JwtMiddleware.JwtTokenHttpContextKey] is not string userEmail)
+            throw new Exception("Very strange. Your email is null. I think something its broken.");
+
+        var user = await DbContext.Users
+            .SingleOrDefaultAsync(el => el.Email == userEmail);
+
+        if (user == null)
+            throw new Exception("Very strange. You is null. I think something its broken.");
+
+        var userCompany = await DbContext.Companies
+            .SingleOrDefaultAsync(el => el.CreatorUserId == user.Id);
+
+        if (userCompany != null)
+            throw new Exception($"User already has company with name: {userCompany.Name}");
+
+        var newCompany = await DbContext.Companies.AddAsync(new Company
+        {
+            Name = request.Name,
+            CreatorUserId = user.Id
+        });
+
+        await DbContext.SaveChangesAsync();
+
+        return new CreateCompanyResponseApiDto
+        {
+            Item = new CompanyApiDto
+            {
+                CreationDate = newCompany.Entity.CreationDate,
+                Name = newCompany.Entity.Name
+            }
+        };
     }
     
     [HttpPut("{companyId:int}/member/{memberId:int}")]

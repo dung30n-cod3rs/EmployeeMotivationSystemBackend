@@ -54,26 +54,25 @@ public sealed class CompaniesController : BaseController
         return new GetCompanyMembersByIdResponseApiDto()
         {
             Items = members.Select(
-              el => new GetCompanyMembersByIdResponseApiDto
-                        .GetCompanyMembersByIdItemResponseApiDto
-              {
-                  CompanyCreationDate = el.Company.CreationDate,
-                  CompanyName = el.Company.Name,
-                  UserCreationDate = el.User.CreationDate,
-                  UserName = el.User.Name,
-                  UserEmail = el.User.Email,
-                  PositionCreationDate = el.Position.CreationDate,
-                  PositionName = el.Position.Name,
-                  PositionWeight = el.Position.Weight,
-                  Salary = el.Salary
-              })
+                  el => new GetCompanyMembersByIdResponseApiDto.GetCompanyMembersByIdItemResponseApiDto
+                  {
+                      CompanyCreationDate = el.Company.CreationDate,
+                      CompanyName = el.Company.Name,
+                      UserCreationDate = el.User.CreationDate,
+                      UserId = el.User.Id,
+                      UserName = el.User.Name,
+                      UserEmail = el.User.Email,
+                      PositionCreationDate = el.Position.CreationDate,
+                      PositionName = el.Position.Name,
+                      PositionWeight = el.Position.Weight,
+                      Salary = el.Salary
+                  })
         };
     }
 
     [HttpPost("RatingByFilter")]
     public async Task<GetCompanyRatingByFilterResponseApiDto>
-    GetCompanyRatingById(
-        [FromBody] GetCompanyRatingByFilterRequestApiDto request)
+    GetCompanyRatingById([FromBody] GetCompanyRatingByFilterRequestApiDto request)
     {
         var metric = await DbContext.Metrics.SingleOrDefaultAsync(
             el => el.Id == request.MetricId);
@@ -81,8 +80,9 @@ public sealed class CompaniesController : BaseController
         if (metric == null)
             throw new Exception($"Metric with id: {request.MetricId} not found!");
 
-        var filial = await DbContext.Filials.Include(filial => filial.Company)
-                         .SingleOrDefaultAsync(el => el.Id == request.FilialId);
+        var filial = await DbContext.Filials
+            .Include(filial => filial.Company)
+            .SingleOrDefaultAsync(el => el.Id == request.FilialId);
 
         if (filial == null)
             throw new Exception($"Filial with id: {request.FilialId} not found!");
@@ -91,7 +91,7 @@ public sealed class CompaniesController : BaseController
             el => el.Id == request.PositionId);
 
         if (position == null)
-            throw new Exception($"Filial with id: {request.PositionId} not found!");
+            throw new Exception($"Position with id: {request.PositionId} not found!");
 
         var membersOfCurrentFilial =
             await DbContext.CompaniesUsersFilials.Include(el => el.CompanyUser)

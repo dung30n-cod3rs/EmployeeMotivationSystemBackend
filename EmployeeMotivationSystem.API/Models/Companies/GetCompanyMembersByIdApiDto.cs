@@ -9,6 +9,7 @@ public sealed record GetCompanyMembersByIdResponseApiDto
         public required DateTime CompanyCreationDate { get; init; }
         public required string CompanyName { get; init; }
         
+        public required int UserId { get; init; }
         public required DateTime UserCreationDate { get; init; }
         public required string UserName { get; init; }
         public required string UserEmail { get; init; }

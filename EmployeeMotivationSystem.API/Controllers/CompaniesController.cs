@@ -94,14 +94,16 @@ public sealed class CompaniesController : BaseController
             throw new Exception($"Position with id: {request.PositionId} not found!");
 
         var membersOfCurrentFilial =
-            await DbContext.CompaniesUsersFilials.Include(el => el.CompanyUser)
+            await DbContext.CompaniesUsersFilials
+                .Include(el => el.CompanyUser)
                 .ThenInclude(el => el.User)
                 .Where(el => el.FilialId == filial.Id)
                 .Select(el => el.CompanyUser.User.Id)
                 .ToArrayAsync();
         
         var values =
-            await DbContext.CompaniesUsersMetrics.Include(el => el.Metric)
+            await DbContext.CompaniesUsersMetrics
+                .Include(el => el.Metric)
                 .Include(el => el.Member)
                 .ThenInclude(el => el.User)
                 .Where(el => el.Metric.CreationDate >= request.CreationDateFrom)
@@ -122,20 +124,54 @@ public sealed class CompaniesController : BaseController
             .Where(el => el.MetricId == request.MetricId)
             .GroupBy(el => new { el.MetricId, el.Name, el.TargetValue })
             .Select(el => new { el.Key, Count = el.Count() })
+            // .OrderByDescending(el => el.Count)
+            .Select((el, index) => new { Index = index + 1, el.Key, el.Count })
+            .ToList();
+
+        var usersWithZeroMetrics = await DbContext.CompaniesUsersMetrics
+            .Include(el => el.Metric)
+            .Include(el => el.Member)
+            .ThenInclude(el => el.User)
+            .Where(el => !membersOfCurrentFilial.Contains(el.MemberId))
+            .Select(el => new
+            {
+                UserId = el.MemberId,
+                Name = el.Member.User.Name,
+                MetricId = el.MetricId,
+                TargetValue = el.Metric.TargetValue,
+                MemberValue = 0
+            })
+            .ToArrayAsync();
+        
+        results.AddRange(
+            usersWithZeroMetrics.Select(el => new
+            {
+                Index = 0,
+                Key = new
+                {
+                    MetricId = el.MetricId,
+                    Name = el.Name,
+                    TargetValue = el.TargetValue
+                },
+                Count = 0
+            })
+        );
+
+        var trueResults = results
             .OrderByDescending(el => el.Count)
-            .Select((el, index) => new { Index = index + 1, el.Key,el.Count  })
+            .Select((el, index) => new { Index = index + 1, el.Key, el.Count })
             .ToArray();
         
         return new GetCompanyRatingByFilterResponseApiDto
         {
             Items = results.Select(
-              el => new GetCompanyRatingByFilterResponseApiDto.GetCompanyRatingByFilterItemResponseApiDto
-              {
-                  Place = el.Index,
-                  Name = el.Key.Name,
-                  TargetValue = el.Key.TargetValue,
-                  MemberValue = el.Count
-              })
+                  el => new GetCompanyRatingByFilterResponseApiDto.GetCompanyRatingByFilterItemResponseApiDto
+                  {
+                      Place = el.Index,
+                      Name = el.Key.Name,
+                      TargetValue = el.Key.TargetValue,
+                      MemberValue = el.Count
+                  })
         };
     }
 

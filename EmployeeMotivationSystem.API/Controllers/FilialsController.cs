@@ -118,11 +118,17 @@ public sealed class FilialsController : BaseController
 
         if (member == null)
             throw new Exception($"Member with id: {request.FilialId} not found!");
+
+        var companyUser = await DbContext.CompaniesUsers
+            .SingleOrDefaultAsync(el => el.UserId == request.MemberId);
+
+        if (companyUser == null)
+            throw new Exception($"CompanyUser with UserId: {request.MemberId} not found, i think something its broken.");
         
         await DbContext.CompaniesUsersFilials
             .AddAsync(new CompaniesUsersFilials
             {
-                CompanyUserId = request.MemberId,
+                CompanyUserId = companyUser.Id,
                 FilialId = request.FilialId,
             });
 

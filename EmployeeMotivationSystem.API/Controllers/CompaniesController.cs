@@ -99,7 +99,7 @@ public sealed class CompaniesController : BaseController
                 .Where(el => el.FilialId == filial.Id)
                 .Select(el => el.CompanyUser.User.Id)
                 .ToArrayAsync();
-
+        
         var values =
             await DbContext.CompaniesUsersMetrics.Include(el => el.Metric)
                 .Include(el => el.Member)
@@ -109,22 +109,29 @@ public sealed class CompaniesController : BaseController
                 .Where(el => membersOfCurrentFilial.Contains(el.MemberId))
                 .Select(el => new
                 {
+                    UserId = el.MemberId,
                     Name = el.Member.User.Name,
+                    MetricId = el.MetricId,
                     TargetValue = el.Metric.TargetValue,
                     MemberValue = membersOfCurrentFilial.Count(k => k == el.MemberId)
                 })
                 .OrderBy(el => el.MemberValue)
                 .ToArrayAsync();
 
+        var results = values
+            .Where(el => el.MetricId == request.MetricId)
+            .GroupBy(el => new { el.MetricId, el.Name, el.TargetValue })
+            .Select(el => new { el.Key, Count = el.Count() })
+            .ToArray();
+        
         return new GetCompanyRatingByFilterResponseApiDto
         {
-            Items = values.Select(
-              el => new GetCompanyRatingByFilterResponseApiDto
-                        .GetCompanyRatingByFilterItemResponseApiDto
+            Items = results.Select(
+              el => new GetCompanyRatingByFilterResponseApiDto.GetCompanyRatingByFilterItemResponseApiDto
               {
-                  Name = el.Name,
-                  TargetValue = el.TargetValue,
-                  MemberValue = el.MemberValue
+                  Name = el.Key.Name,
+                  TargetValue = el.Key.TargetValue,
+                  MemberValue = el.Count
               })
         };
     }

@@ -128,43 +128,43 @@ public sealed class CompaniesController : BaseController
             .Select((el, index) => new { Index = index + 1, el.Key, el.Count })
             .ToList();
 
-        var usersWithZeroMetrics = await DbContext.CompaniesUsersMetrics
-            .Include(el => el.Metric)
-            .Include(el => el.Member)
-            .ThenInclude(el => el.User)
-            .Where(el => !membersOfCurrentFilial.Contains(el.MemberId))
-            .Select(el => new
-            {
-                UserId = el.MemberId,
-                Name = el.Member.User.Name,
-                MetricId = el.MetricId,
-                TargetValue = el.Metric.TargetValue,
-                MemberValue = 0
-            })
-            .ToArrayAsync();
-        
-        results.AddRange(
-            usersWithZeroMetrics.Select(el => new
-            {
-                Index = 0,
-                Key = new
-                {
-                    MetricId = el.MetricId,
-                    Name = el.Name,
-                    TargetValue = el.TargetValue
-                },
-                Count = 0
-            })
-        );
+        // var usersWithZeroMetrics = await DbContext.CompaniesUsersMetrics
+        //     .Include(el => el.Metric)
+        //     .Include(el => el.Member)
+        //     .ThenInclude(el => el.User)
+        //     .Where(el => !membersOfCurrentFilial.Contains(el.MemberId))
+        //     .Select(el => new
+        //     {
+        //         UserId = el.MemberId,
+        //         Name = el.Member.User.Name,
+        //         MetricId = el.MetricId,
+        //         TargetValue = el.Metric.TargetValue,
+        //         MemberValue = 0
+        //     })
+        //     .ToArrayAsync();
+        //
+        // results.AddRange(
+        //     usersWithZeroMetrics.Select(el => new
+        //     {
+        //         Index = 0,
+        //         Key = new
+        //         {
+        //             MetricId = el.MetricId,
+        //             Name = el.Name,
+        //             TargetValue = el.TargetValue
+        //         },
+        //         Count = 0
+        //     })
+        // );
 
-        var trueResults = results
-            .OrderByDescending(el => el.Count)
-            .Select((el, index) => new { Index = index + 1, el.Key, el.Count })
-            .ToArray();
+        // var trueResults = results
+        //     .OrderByDescending(el => el.Count)
+        //     .Select((el, index) => new { Index = index + 1, el.Key, el.Count })
+        //     .ToArray();
         
         return new GetCompanyRatingByFilterResponseApiDto
         {
-            Items = trueResults.Select(
+            Items = results.Select(
                   el => new GetCompanyRatingByFilterResponseApiDto.GetCompanyRatingByFilterItemResponseApiDto
                   {
                       Place = el.Index,

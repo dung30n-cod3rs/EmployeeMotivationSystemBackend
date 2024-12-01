@@ -122,8 +122,8 @@ public sealed class CompaniesController : BaseController
             .Where(el => el.MetricId == request.MetricId)
             .GroupBy(el => new { el.MetricId, el.Name, el.TargetValue })
             .Select(el => new { el.Key, Count = el.Count() })
-            .OrderBy(el => el.Count)
-            .Select((el, index) => new { Index = index, el.Key,el.Count  })
+            .OrderByDescending(el => el.Count)
+            .Select((el, index) => new { Index = index + 1, el.Key,el.Count  })
             .ToArray();
         
         return new GetCompanyRatingByFilterResponseApiDto

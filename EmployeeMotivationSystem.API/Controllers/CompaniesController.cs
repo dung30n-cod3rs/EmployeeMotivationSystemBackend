@@ -87,7 +87,7 @@ public sealed class CompaniesController : BaseController
         if (filial == null)
             throw new Exception($"Filial with id: {request.FilialId} not found!");
 
-        var position = await DbContext.Filials.SingleOrDefaultAsync(
+        var position = await DbContext.Positions.SingleOrDefaultAsync(
             el => el.Id == request.PositionId);
 
         if (position == null)

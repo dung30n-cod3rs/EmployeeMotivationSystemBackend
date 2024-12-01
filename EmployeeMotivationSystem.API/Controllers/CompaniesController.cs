@@ -164,7 +164,7 @@ public sealed class CompaniesController : BaseController
         
         return new GetCompanyRatingByFilterResponseApiDto
         {
-            Items = results.Select(
+            Items = trueResults.Select(
                   el => new GetCompanyRatingByFilterResponseApiDto.GetCompanyRatingByFilterItemResponseApiDto
                   {
                       Place = el.Index,

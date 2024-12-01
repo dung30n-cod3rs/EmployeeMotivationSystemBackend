@@ -18,6 +18,7 @@ public sealed record GetCompanyRatingByFilterResponseApiDto
     
     public sealed record GetCompanyRatingByFilterItemResponseApiDto
     {
+        public required int Place { get; init; }
         public required string Name { get; init; }
         public required double TargetValue { get; init; }
         public required int MemberValue { get; init; }
